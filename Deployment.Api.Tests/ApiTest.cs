@@ -1,9 +1,8 @@
-using System;
 using Xunit;
 
 namespace Deployment.Api.Tests
 {
-    public class UnitTest1
+    public class ApiTest
     {
         [Fact]
         public void Test1()
