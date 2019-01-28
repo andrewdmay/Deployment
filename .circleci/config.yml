@@ -1,6 +1,8 @@
-version: 2
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@2.0.3
 jobs:
-  build-and-test:
+  build_and_test:
     docker:
       - image: microsoft/dotnet:2.1-sdk
     steps:
@@ -16,25 +18,18 @@ jobs:
             export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet cake --bootstrap
             dotnet cake
-  
-  package:
-    docker:
-      - image: microsoft/dotnet:2.1-sdk
-    steps:
-      - run:
-          name: Docker Build
-          command: |
-            export PATH="$PATH:$HOME/.dotnet/tools"
-            dotnet cake --target=PackageApi
 
 workflows:
   version: 2
   build-deploy:
     jobs:
-      - build-and-test
-      - package:
+      - build_and_test
+      - aws-ecr/build_and_push_image:
+          context: lab-us-east-1
+          repo: microservice/deployment
+          create-repo: true
           requires:
-            - build-and-test
+            - build_and_test
           filters:
             branches:
               only: master
