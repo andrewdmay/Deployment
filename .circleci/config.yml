@@ -24,7 +24,15 @@ jobs:
 
   tag_with_version:
     executor: dotnetsdk
+    parameters:
+      fingerprint:
+        default: SSH_FINGERPRINT_PUSH
+        description: SSH Fingerprint of Deploy Key with Push permissions
+        type: env_var_name
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "<< parameters.fingerprint >>"
       - checkout
       - run:
           name: Install Tools
