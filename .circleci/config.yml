@@ -25,6 +25,7 @@ workflows:
     jobs:
       - build_and_test
       - aws-ecr/build_and_push_image:
+          context: lab-us-east-1
           repo: microservice/deployment
           create-repo: true
           requires:
