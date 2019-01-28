@@ -8,19 +8,27 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install "Cake.Tool" .NET Core global tool
+          name: Install Tools
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet tool install -g Cake.Tool --version 0.32.0
+            dotnet tool install -g nbgv --version 2.3.38
+            apt-get update
+            apt-get install jq
       - run:
           name: Test
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet cake --bootstrap
             dotnet cake
+      - run:
+          name: Get Version
+          command: |
+            export PATH="$PATH:$HOME/.dotnet/tools"
+            VERSION=`nbgv get-version -f json | jq -r .NuGetPackageVersion`
+            echo "NuGet Package Version: $VERSION"
 
 workflows:
-  version: 2
   build-deploy:
     jobs:
       - build_and_test

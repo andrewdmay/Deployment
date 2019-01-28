@@ -14,10 +14,15 @@ var packageApi = Task("PackageApi")
     .IsDependentOn(testApi)
     .Does(() => 
 {
+    var repository = Argument<string>("dockerRepo", null) ?? EnvironmentVariable("DOCKER_REPO") ?? "";
+    if (!String.IsNullOrEmpty(repository)) {
+        repository = repository + "/";
+    }
+    var tag = Argument<string>("dockerTag", null) ?? EnvironmentVariable("DOCKER_TAG") ?? "latest";
     DockerBuild(new DockerImageBuildSettings {
         Pull = true,
         Rm = true,
-        Tag = new string[]{"microservice/deployment:latest"}
+        Tag = new string[]{repository + "microservice/deployment:" + tag}
     }, ".");
 });
 
