@@ -1,10 +1,13 @@
 version: 2.1
+executors:
+    dotnetsdk:
+      docker:
+        - image: microsoft/dotnet:2.1.503-sdk-stretch
 orbs:
   aws-ecr: circleci/aws-ecr@2.0.3
 jobs:
   build_and_test:
-    docker:
-      - image: microsoft/dotnet:2.1-sdk
+    executor: dotnetsdk
     steps:
       - checkout
       - run:
@@ -12,26 +15,28 @@ jobs:
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet tool install -g Cake.Tool --version 0.32.0
-            dotnet tool install -g nbgv --version 2.3.38
-            apt-get update
-            apt-get install -y jq
-      - run:
-          name: Set Version
-          command: |
-            export PATH="$PATH:$HOME/.dotnet/tools"
-            nbgv cloud
       - run:
           name: Test
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet cake --bootstrap
             dotnet cake
+
+  tag_with_version:
+    executor: dotnetsdk
+    steps:
+      - checkout
       - run:
-          name: Get Version
+          name: Install Tools
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
-            VERSION=`nbgv get-version -f json | jq -r .NuGetPackageVersion`
-            echo "NuGet Package Version: $VERSION"
+            dotnet tool install -g nbgv --version 2.3.38
+      - run:
+          name: Set Version
+          command: |
+            export PATH="$PATH:$HOME/.dotnet/tools"
+            nbgv tag
+            git push --follow-tags
 
 workflows:
   build-deploy:
@@ -43,6 +48,12 @@ workflows:
           create-repo: true
           requires:
             - build_and_test
+          filters:
+            branches:
+              only: master
+  tag_with_version:
+    jobs:
+      - tag_with_version:
           filters:
             branches:
               only: master
