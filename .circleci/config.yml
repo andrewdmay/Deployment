@@ -14,7 +14,7 @@ jobs:
             dotnet tool install -g Cake.Tool --version 0.32.0
             dotnet tool install -g nbgv --version 2.3.38
             apt-get update
-            apt-get install jq
+            apt-get install -y jq
       - run:
           name: Test
           command: |
