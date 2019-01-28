@@ -13,5 +13,6 @@ jobs:
       - run:
           name: Test
           command: |
+            export PATH="$PATH:$HOME/.dotnet/tools"
             dotnet cake --bootstrap
             dotnet cake
