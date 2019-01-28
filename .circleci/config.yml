@@ -16,6 +16,11 @@ jobs:
             apt-get update
             apt-get install -y jq
       - run:
+          name: Set Version
+          command: |
+            export PATH="$PATH:$HOME/.dotnet/tools"
+            nbgv cloud
+      - run:
           name: Test
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
