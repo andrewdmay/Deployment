@@ -74,4 +74,7 @@ workflows:
           tag: $CIRCLE_TAG
           requires:
             - build_and_test
+          filters:
+            tags:
+              only: /v.*/
 
