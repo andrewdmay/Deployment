@@ -2,6 +2,7 @@
   "version": "1.0",
   "publicReleaseRefSpec": [
     "^refs/heads/master$",
+    "^refs/heads/develop$",
     "^refs/heads/v\\d+(?:\\.\\d+)?$"
   ],
   "cloudBuild": {
