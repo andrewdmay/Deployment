@@ -30,9 +30,13 @@ jobs:
         description: SSH Fingerprint of Deploy Key with Push permissions
         type: env_var_name
     steps:
+      - run:
+          name: Echo fingerprint
+          command: |
+            echo "<< parameters.fingerprint >>"
       - add_ssh_keys:
           fingerprints:
-            - "<< parameters.fingerprint >>"
+            - << parameters.fingerprint >>
       - checkout
       - run:
           name: Install Tools
