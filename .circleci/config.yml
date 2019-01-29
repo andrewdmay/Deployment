@@ -33,10 +33,10 @@ jobs:
       - run:
           name: Echo fingerprint
           command: |
-            echo "<< parameters.fingerprint >>"
+            echo "$<< parameters.fingerprint >>"
       - add_ssh_keys:
           fingerprints:
-            - << parameters.fingerprint >>
+            - $<< parameters.fingerprint >>
       - checkout
       - run:
           name: Install Tools
@@ -54,15 +54,15 @@ workflows:
   build-deploy:
     jobs:
       - build_and_test
-      - aws-ecr/build_and_push_image:
-          context: lab-us-east-1
-          repo: microservice/deployment
-          create-repo: true
-          requires:
-            - build_and_test
-          filters:
-            branches:
-              only: master
+      # - aws-ecr/build_and_push_image:
+      #     context: lab-us-east-1
+      #     repo: microservice/deployment
+      #     create-repo: true
+      #     requires:
+      #       - build_and_test
+      #     filters:
+      #       branches:
+      #         only: master
   tag_with_version:
     jobs:
       - tag_with_version:
