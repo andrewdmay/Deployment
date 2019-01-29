@@ -46,6 +46,8 @@ workflows:
     jobs:
       - build_and_test
       - tag_with_version:
+          requires:
+            - build_and_test
           filters:
             branches:
               only: develop
@@ -67,14 +69,17 @@ workflows:
           filters:
             tags:
               only: /v.*/
+            branches:
+              ignore: /.*/
       - aws-ecr/build_and_push_image:
           context: lab-us-east-1
           repo: microservice/deployment
-          create-repo: true
+          create-repo: false
           tag: $CIRCLE_TAG
           requires:
             - build_and_test
           filters:
             tags:
               only: /v.*/
-
+            branches:
+              ignore: /.*/
