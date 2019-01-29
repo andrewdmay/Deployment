@@ -42,21 +42,36 @@ jobs:
             git push --tags
 
 workflows:
-  build-deploy:
+  branch_builds:
     jobs:
       - build_and_test
-      # - aws-ecr/build_and_push_image:
-      #     context: lab-us-east-1
-      #     repo: microservice/deployment
-      #     create-repo: true
-      #     requires:
-      #       - build_and_test
-      #     filters:
-      #       branches:
-      #         only: master
-  tag_with_version:
-    jobs:
       - tag_with_version:
           filters:
             branches:
-              only: master
+              only: develop
+      - aws-ecr/build_and_push_image:
+          context: lab-us-east-1
+          repo: microservice/deployment
+          create-repo: true
+          tag: $CIRCLE_BRANCH
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              ignore: 
+                - develop
+                - master
+  tag_builds:
+    jobs:
+      - build_and_test:
+          filters:
+            tags:
+              only: /v.*/
+      - aws-ecr/build_and_push_image:
+          context: lab-us-east-1
+          repo: microservice/deployment
+          create-repo: true
+          tag: $CIRCLE_TAG
+          requires:
+            - build_and_test
+
