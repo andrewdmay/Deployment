@@ -39,7 +39,7 @@ jobs:
           command: |
             export PATH="$PATH:$HOME/.dotnet/tools"
             nbgv tag
-            git push --follow-tags
+            git push --tags
 
 workflows:
   build-deploy:
