@@ -1,0 +1,50 @@
+stages:
+  - test
+  - package
+  - deploy_dev
+
+unit_tests:
+  stage: test
+  image: microsoft/dotnet:2.1.503-sdk-stretch
+  script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g Cake.Tool --version 0.32.0
+    - dotnet cake --bootstrap
+    - dotnet cake
+
+build_docker_image:
+  stage: package
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t microservice/deployment .
+
+build_sdk:
+  stage: package
+  image: microsoft/dotnet:2.1.503-sdk-stretch
+  script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g Cake.Tool --version 0.32.0
+    - dotnet cake --bootstrap
+    - dotnet cake --target=Release --nugetApiKey=foo
+
+deploy_container_dev:
+  stage: deploy_dev
+  script:
+    - echo "Deploy dev container"
+  when: manual
+  only:
+    refs:
+      - master
+      - develop
+
+deploy_something_dev:
+  stage: deploy_dev
+  script:
+    - echo "Deploy dev something else"
+  when: manual
+  only:
+    refs:
+      - master
+      - develop

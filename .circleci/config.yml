@@ -54,7 +54,7 @@ workflows:
       - aws-ecr/build_and_push_image:
           context: lab-us-east-1
           repo: microservice/deployment
-          create-repo: true
+          create-repo: false
           tag: $CIRCLE_BRANCH
           requires:
             - build_and_test
