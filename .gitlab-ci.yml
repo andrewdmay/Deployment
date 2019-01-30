@@ -1,11 +1,24 @@
 image: microsoft/dotnet:2.1.503-sdk-stretch
-stages:
-  - test
+services:
+  - docker:dind
 
-build:
-  stage: test
-  script:
+before_script:
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - dotnet tool install -g Cake.Tool --version 0.32.0
+    - dotnet tool install -g nbgv --version 2.3.38
+
+stages:
+  - test
+  - package
+
+unit_tests:
+  stage: test
+  script:
     - dotnet cake --bootstrap
     - dotnet cake
+
+build_docker_image:
+  stage: package
+  script:
+    - dotnet cake --bootstrap
+    - dotnet cake --target=PackageApi
