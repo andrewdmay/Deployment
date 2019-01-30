@@ -1,17 +1,6 @@
 stages:
-  - version
   - test
   - package
-
-set_version:
-  stage: version
-  image: microsoft/dotnet:2.1.503-sdk-stretch
-  script:
-    - export PATH="$PATH:$HOME/.dotnet/tools"
-    - dotnet tool install -g nbgv --version 2.3.38
-    - env
-    - nbgv cloud -a
-    - env
 
 unit_tests:
   stage: test
@@ -29,3 +18,12 @@ build_docker_image:
     - docker:dind
   script:
     - docker build -t microservice/deployment .
+
+build_sdk:
+  stage: package
+  image: microsoft/dotnet:2.1.503-sdk-stretch
+  script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g Cake.Tool --version 0.32.0
+    - dotnet cake --bootstrap
+    - dotnet cake --target=Release --nugetApiKey=foo
