@@ -1,0 +1,11 @@
+image: microsoft/dotnet:2.1.503-sdk-stretch
+stages:
+  - test
+
+build:
+  stage: test
+  script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g Cake.Tool --version 0.32.0
+    - dotnet cake --bootstrap
+    - dotnet cake
