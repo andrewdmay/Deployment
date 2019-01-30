@@ -1,6 +1,7 @@
 stages:
   - test
   - package
+  - deploy_dev
 
 unit_tests:
   stage: test
@@ -27,3 +28,23 @@ build_sdk:
     - dotnet tool install -g Cake.Tool --version 0.32.0
     - dotnet cake --bootstrap
     - dotnet cake --target=Release --nugetApiKey=foo
+
+deploy_container_dev:
+  stage: deploy_dev
+  script:
+    - echo "Deploy dev container"
+  when: manual
+  only:
+    refs:
+      - master
+      - develop
+
+deploy_something_dev:
+  stage: deploy_dev
+  script:
+    - echo "Deploy dev something else"
+  when: manual
+  only:
+    refs:
+      - master
+      - develop
