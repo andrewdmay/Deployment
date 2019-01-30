@@ -1,24 +1,29 @@
-image: microsoft/dotnet:2.1.503-sdk-stretch
-services:
-  - docker:dind
-
-before_script:
-    - export PATH="$PATH:$HOME/.dotnet/tools"
-    - dotnet tool install -g Cake.Tool --version 0.32.0
-    - dotnet tool install -g nbgv --version 2.3.38
-
 stages:
+  - version
   - test
   - package
 
+set_version:
+  stage: version
+  image: microsoft/dotnet:2.1.503-sdk-stretch
+  script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g nbgv --version 2.3.38
+    - nbgv cloud
+
 unit_tests:
   stage: test
+  image: microsoft/dotnet:2.1.503-sdk-stretch
   script:
+    - export PATH="$PATH:$HOME/.dotnet/tools"
+    - dotnet tool install -g Cake.Tool --version 0.32.0
     - dotnet cake --bootstrap
     - dotnet cake
 
 build_docker_image:
   stage: package
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - dotnet cake --bootstrap
-    - dotnet cake --target=PackageApi
+    - docker build -t microservice/deployment .
