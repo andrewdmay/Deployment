@@ -9,7 +9,9 @@ set_version:
   script:
     - export PATH="$PATH:$HOME/.dotnet/tools"
     - dotnet tool install -g nbgv --version 2.3.38
-    - nbgv cloud
+    - env
+    - nbgv cloud -a
+    - env
 
 unit_tests:
   stage: test
