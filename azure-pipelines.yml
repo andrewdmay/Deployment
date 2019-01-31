@@ -1,0 +1,9 @@
+pool:
+vmImage: 'Ubuntu 16.04'
+
+steps:
+  - script: |
+      export PATH="$PATH:$HOME/.dotnet/tools"
+      dotnet tool install -g Cake.Tool --version 0.32.0
+      dotnet cake --bootstrap
+      dotnet cake
