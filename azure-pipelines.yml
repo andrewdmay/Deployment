@@ -26,7 +26,7 @@ jobs:
         displayName: Docker Build
         inputs:
           command: build
-          imageName: deployment:$(Build.BuildId)
+          imageName: deployment:$(Build.BuildNumber)
   - job: cake_build
     pool: AWS Ubuntu
     container: dotnetsdk
