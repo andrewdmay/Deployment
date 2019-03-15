@@ -18,6 +18,10 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
+  - job: docker_build
+    dependsOn: task_build
+    pool: AWS Ubuntu
+    steps:
       - task: Docker@1
         displayName: Docker Build
         inputs:
