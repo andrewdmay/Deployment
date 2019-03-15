@@ -1,16 +1,15 @@
-pool: AWS Ubuntu
 resources:
   containers:
     - container: dotnetsdk
       image: microsoft/dotnet:2.1.503-sdk-stretch
 
-pipeline:
-  jobs:
-    - job: unit_tests
-      container: dotnetsdk
-      steps:
-        - script: |
-            export PATH="$PATH:$HOME/.dotnet/tools"
-            dotnet tool install -g Cake.Tool --version 0.32.0
-            dotnet cake --bootstrap
-            dotnet cake
+jobs:
+  - job: unit_tests
+    pool: AWS Ubuntu
+    container: dotnetsdk
+    steps:
+      - script: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet tool install -g Cake.Tool --version 0.32.0
+          dotnet cake --bootstrap
+          dotnet cake
