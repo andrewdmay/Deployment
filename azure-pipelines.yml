@@ -4,7 +4,21 @@ resources:
       image: microsoft/dotnet:2.1.503-sdk-stretch
 
 jobs:
-  - job: unit_tests
+  - job: task_build
+    pool: AWS Ubuntu
+    container: dotnetsdk
+    steps:
+      - task: DotNetCoreCLI@2
+        displayName: Dotnet Build
+        inputs:
+          command: build
+          projects: '**/*.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: Dotnet Test
+        inputs:
+          command: test
+          projects: '**/*Tests.csproj'
+  - job: cake_build
     pool: AWS Ubuntu
     container: dotnetsdk
     steps:
