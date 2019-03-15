@@ -18,6 +18,11 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
+      - task: Docker@1
+        displayName: Docker Build
+        inputs:
+          command: build
+          imageName: deployment:${Build.BuildId}
   - job: cake_build
     pool: AWS Ubuntu
     container: dotnetsdk
