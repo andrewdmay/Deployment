@@ -1,3 +1,4 @@
+pool: AWS Ubuntu
 resources:
   containers:
     - container: dotnetsdk
