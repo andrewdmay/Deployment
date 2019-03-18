@@ -2,6 +2,8 @@ resources:
   containers:
     - container: dotnetsdk
       image: microsoft/dotnet:2.1.503-sdk-stretch
+    - container: dind
+      image: docker:latest
 
 jobs:
   - job: task_build
@@ -21,6 +23,7 @@ jobs:
   - job: docker_build
     dependsOn: task_build
     pool: AWS Ubuntu
+    container: dind
     steps:
       - task: Docker@1
         displayName: Docker Build
