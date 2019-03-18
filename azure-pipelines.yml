@@ -20,16 +20,14 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
-      - bash: echo $NBGV_CloudBuildNumber
-      - bash: echo $(NBGV_CloudBuildNumber)
   - job: echo_vars
-    dependsOn: task_build
+    dependsOn: cake_build
     pool: AWS Ubuntu
     steps:
       - bash: echo $NBGV_CloudBuildNumber
       - bash: echo $(NBGV_CloudBuildNumber)
   - job: docker_build
-    dependsOn: task_build
+    dependsOn: cake_build
     pool: AWS Ubuntu
     steps:
       - task: Docker@1
@@ -44,5 +42,9 @@ jobs:
       - script: |
           export PATH="$PATH:$HOME/.dotnet/tools"
           dotnet tool install -g Cake.Tool --version 0.32.0
+          dotnet tool install -g nbgv
           dotnet cake --bootstrap
           dotnet cake
+          nbgv cloud -a
+      - bash: echo $NBGV_CloudBuildNumber
+      - bash: echo $(NBGV_CloudBuildNumber)
