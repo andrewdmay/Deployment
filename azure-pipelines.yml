@@ -20,6 +20,14 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
+      - bash: echo $NBGV_CloudBuildNumber
+      - bash: echo $(NBGV_CloudBuildNumber)
+  - job: echo_vars
+    dependsOn: task_build
+    pool: AWS Ubuntu
+    steps:
+      - bash: echo $NBGV_CloudBuildNumber
+      - bash: echo $(NBGV_CloudBuildNumber)
   - job: docker_build
     dependsOn: task_build
     pool: AWS Ubuntu
