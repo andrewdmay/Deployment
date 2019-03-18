@@ -20,13 +20,6 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
-  - job: dind_docker_build
-    dependsOn: task_build
-    pool: AWS Ubuntu
-    container: dind
-    steps:
-      - script: |
-          docker build -t deployment:latest .
   - job: docker_build
     dependsOn: task_build
     pool: AWS Ubuntu
@@ -35,7 +28,7 @@ jobs:
         displayName: Docker Build
         inputs:
           command: build
-          imageName: deployment:$(Build.BuildNumber)
+          imageName: deployment:$(NBGV_CloudBuildNumber)
   - job: cake_build
     pool: AWS Ubuntu
     container: dotnetsdk
