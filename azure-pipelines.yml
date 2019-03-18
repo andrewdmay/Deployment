@@ -2,12 +2,9 @@ resources:
   containers:
     - container: dotnetsdk
       image: microsoft/dotnet:2.1.503-sdk-stretch
-    - container: dind
-      image: docker:latest
 
 jobs:
   - job: set_version
-    pool: AWS Ubuntu
     container: dotnetsdk
     steps:
       - script: |
@@ -18,7 +15,6 @@ jobs:
         name: set_variable
   - job: task_build
     dependsOn: set_version
-    pool: AWS Ubuntu
     container: dotnetsdk
     steps:
       - task: DotNetCoreCLI@2
@@ -35,7 +31,6 @@ jobs:
     dependsOn: 
       - set_version
       - task_build
-    pool: AWS Ubuntu
     variables:
       nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
     steps:
@@ -47,7 +42,6 @@ jobs:
           command: build
           imageName: deployment:$(nuget_version)
   - job: cake_build
-    pool: AWS Ubuntu
     dependsOn: set_version
     container: dotnetsdk
     steps:
