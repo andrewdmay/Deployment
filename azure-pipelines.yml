@@ -14,16 +14,8 @@ jobs:
           export PATH="$PATH:$HOME/.dotnet/tools"
           dotnet tool install -g nbgv
           nbgv cloud -a
-      - bash: echo '##vso[task.setvariable variable=nbgv_cloudbuildnumber;isOutput=true]$(NBGV_CloudBuildNumber)'
+      - bash: echo '##vso[task.setvariable variable=nuget_version;isOutput=true]$(NBGV_NuGetPackageVersion)'
         name: set_variable
-  - job: echo_vars
-    dependsOn: set_version
-    pool: AWS Ubuntu
-    variables:
-      nbgv_cloudbuildnumber: $[ dependencies.set_version.outputs['set_variable.nbgv_cloudbuildnumber'] ]
-    steps:
-      - bash: echo $NBGV_CLOUDBUILDNUMBER
-      - bash: echo $(nbgv_cloudbuildnumber)
   - job: task_build
     dependsOn: set_version
     pool: AWS Ubuntu
@@ -40,16 +32,16 @@ jobs:
           command: test
           projects: '**/*Tests.csproj'
   - job: docker_build
-    dependsOn: set_version
+    dependsOn: task_build
     pool: AWS Ubuntu
     variables:
-      nbgv_cloudbuildnumber: $[ dependencies.set_version.outputs['set_variable.nbgv_cloudbuildnumber'] ]
+      nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
     steps:
       - task: Docker@1
         displayName: Docker Build
         inputs:
           command: build
-          imageName: deployment:$(nbgv_cloudbuildnumber)
+          imageName: deployment:$(nuget_version)
   - job: cake_build
     pool: AWS Ubuntu
     dependsOn: set_version
