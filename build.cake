@@ -3,7 +3,15 @@
 var target = Argument("target", "UnitTests");
 
 var testApi = Task("TestApi")
-    .Does(() => DotNetCoreTest("Deployment.Api.Tests"));
+    .Does(() => 
+{
+    var settings = new DotNetCoreTestSettings();
+    if (EnvironmentVariable("SYSTEM_TEAMPROJECTID") != null)
+    {
+        settings.Logger = "trx;LogFileName=TEST-results.trx";
+    }
+    DotNetCoreTest("Deployment.Api.Tests", settings);
+});
 
 // All Unit Tests
 var unitTests = Task("UnitTests")
