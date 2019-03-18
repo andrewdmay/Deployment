@@ -20,10 +20,16 @@ jobs:
         inputs:
           command: test
           projects: '**/*Tests.csproj'
-  - job: docker_build
+  - job: dind_docker_build
     dependsOn: task_build
     pool: AWS Ubuntu
     container: dind
+    steps:
+      - script: |
+          docker build -t deployment:latest .
+  - job: docker_build
+    dependsOn: task_build
+    pool: AWS Ubuntu
     steps:
       - task: Docker@1
         displayName: Docker Build
