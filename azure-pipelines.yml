@@ -53,7 +53,7 @@ stages:
   - stage: Development
     dependsOn: Build
     jobs:
-      - job: deploy_dev
+      - deployment: deploy_dev
         displayName: Deploy to Development
         container: dotnetsdk
         environment: Development
@@ -66,7 +66,7 @@ stages:
   - stage: Production
     dependsOn: Development
     jobs:
-      - job: deploy_prod
+      - deployment: deploy_prod
         displayName: Deploy to Production
         container: dotnetsdk
         environment: Production
