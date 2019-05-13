@@ -8,38 +8,70 @@ resources:
     - container: dotnetsdk
       image: microsoft/dotnet:2.1.503-sdk-stretch
 
-jobs:
-  - job: set_version
-    container: dotnetsdk
-    steps:
-      - script: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          dotnet tool install -g nbgv
-          nbgv cloud -a
-      - bash: echo '##vso[task.setvariable variable=nuget_version;isOutput=true]$(NBGV_NuGetPackageVersion)'
-        name: set_variable
-  - job: cake_build
-    dependsOn: set_version
-    container: dotnetsdk
-    steps:
-      - script: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          dotnet tool install -g Cake.Tool --version 0.32.0
-          dotnet cake --bootstrap
-          dotnet cake
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: VSTest
-          testResultsFiles: '**/TEST-*.trx'
-  - job: docker_build
-    dependsOn: 
-      - set_version
-      - cake_build
-    variables:
-      nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
-    steps:
-      - task: Docker@1
+stages:
+
+  - stage: Build
+    jobs:
+      - job: set_version
+        displayName: Set Version
+        container: dotnetsdk
+        steps:
+          - script: |
+              export PATH="$PATH:$HOME/.dotnet/tools"
+              dotnet tool install -g nbgv
+              nbgv cloud -a
+          - bash: echo '##vso[task.setvariable variable=nuget_version;isOutput=true]$(NBGV_NuGetPackageVersion)'
+            name: set_variable
+      - job: cake_build
+        displayName: Build and Test
+        dependsOn: set_version
+        container: dotnetsdk
+        steps:
+          - script: |
+              export PATH="$PATH:$HOME/.dotnet/tools"
+              dotnet tool install -g Cake.Tool --version 0.32.0
+              dotnet cake --bootstrap
+              dotnet cake
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: '**/TEST-*.trx'
+      - job: docker_build
         displayName: Docker Build
-        inputs:
-          command: build
-          imageName: deployment:$(nuget_version)
+        dependsOn: 
+          - set_version
+          - cake_build
+        variables:
+          nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
+        steps:
+          - task: Docker@1
+            displayName: Docker Build
+            inputs:
+              command: build
+              imageName: deployment:$(nuget_version)
+
+  - stage: Development
+    dependsOn: Build
+    jobs:
+      - job: deploy_dev
+        displayName: Deploy to Development
+        container: dotnetsdk
+        environment: Development
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: echo "Deploying $(Build.BuildNumber)"
+
+  - stage: Production
+    dependsOn: Development
+    jobs:
+      - job: deploy_prod
+        displayName: Deploy to Production
+        container: dotnetsdk
+        environment: Production
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: echo "Deploying $(Build.BuildNumber)"
