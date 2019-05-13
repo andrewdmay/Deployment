@@ -49,6 +49,18 @@ stages:
             inputs:
               command: build
               imageName: deployment:$(nuget_version)
+      - job: publish_artifact
+        displayName: Publish version number as build artifact
+        dependsOn:
+          - set_version
+          - docker_build
+        variables:
+          nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
+        steps:
+          - bash: echo $(nuget_version) > version.txt
+          - task: PublishPipelineArtifact@0
+            inputs:
+              artifactName: version
 
   - stage: Development
     dependsOn: Build
@@ -57,7 +69,10 @@ stages:
         displayName: Deploy to Development
         container: dotnetsdk
         steps:
-          - bash: echo "Deploying $(Build.BuildNumber)"
+          - task: DownloadPipelineArtifact@0
+            inputs:
+              artifactName: version
+          - bash: VERSION=$(cat version.txt) && echo "Deploying $VERSION"
 
   - stage: Production
     dependsOn: Development
@@ -66,4 +81,7 @@ stages:
         displayName: Deploy to Production
         container: dotnetsdk
         steps:
-          - bash: echo "Deploying $(Build.BuildNumber)"
+          - task: DownloadPipelineArtifact@0
+            inputs:
+              artifactName: version
+          - bash: VERSION=$(cat version.txt) && echo "Deploying $VERSION"
