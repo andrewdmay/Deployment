@@ -53,25 +53,17 @@ stages:
   - stage: Development
     dependsOn: Build
     jobs:
-      - deployment: deploy_dev
+      - job: deploy_dev
         displayName: Deploy to Development
-#        container: dotnetsdk
-        environment: Development
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - bash: echo "Deploying $(Build.BuildNumber)"
+        container: dotnetsdk
+        steps:
+          - bash: echo "Deploying $(Build.BuildNumber)"
 
   - stage: Production
     dependsOn: Development
     jobs:
-      - deployment: deploy_prod
+      - job: deploy_prod
         displayName: Deploy to Production
-#        container: dotnetsdk
-        environment: Production
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - bash: echo "Deploying $(Build.BuildNumber)"
+        container: dotnetsdk
+        steps:
+          - bash: echo "Deploying $(Build.BuildNumber)"
