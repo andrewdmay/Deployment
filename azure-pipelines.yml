@@ -4,7 +4,17 @@ resources:
       image: microsoft/dotnet:2.1.503-sdk-stretch
 
 jobs:
-  - job: unit_tests
+  - job: set_version
+    container: dotnetsdk
+    steps:
+      - script: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet tool install -g nbgv
+          nbgv cloud -a
+      - bash: echo '##vso[task.setvariable variable=nuget_version;isOutput=true]$(NBGV_NuGetPackageVersion)'
+        name: set_variable
+  - job: cake_build
+    dependsOn: set_version
     container: dotnetsdk
     steps:
       - script: |
@@ -12,3 +22,19 @@ jobs:
           dotnet tool install -g Cake.Tool --version 0.32.0
           dotnet cake --bootstrap
           dotnet cake
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/TEST-*.trx'
+  - job: docker_build
+    dependsOn: 
+      - set_version
+      - cake_build
+    variables:
+      nuget_version: $[ dependencies.set_version.outputs['set_variable.nuget_version'] ]
+    steps:
+      - task: Docker@1
+        displayName: Docker Build
+        inputs:
+          command: build
+          imageName: deployment:$(nuget_version)
