@@ -55,7 +55,7 @@ stages:
     jobs:
       - deployment: deploy_dev
         displayName: Deploy to Development
-        container: dotnetsdk
+#        container: dotnetsdk
         environment: Development
         strategy:
           runOnce:
@@ -68,7 +68,7 @@ stages:
     jobs:
       - deployment: deploy_prod
         displayName: Deploy to Production
-        container: dotnetsdk
+#        container: dotnetsdk
         environment: Production
         strategy:
           runOnce:
