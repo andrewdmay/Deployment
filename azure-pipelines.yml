@@ -101,7 +101,9 @@ stages:
               artifactName: version
           - bash: |
               VERSION=$(cat version.txt)
+              git config --global user.name "Azure DevOps"
+              git config --global user.email "azuredevops-noreply@invalid.tst"
               git checkout master
               git merge origin/develop
-              git tag -a $VERSION -m "Release $VERSION"
+              git tag -a "az-$VERSION" -m "Release $VERSION"
               git push origin --follow-tags
