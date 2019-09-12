@@ -95,7 +95,7 @@ stages:
         steps:
           - checkout: self
             clean: true
-            presistCredentials: true
+            persistCredentials: true
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: version
